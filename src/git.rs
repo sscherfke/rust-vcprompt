@@ -49,14 +49,13 @@ fn parse_status(status: &str) -> Status {
                 _ => (),
             },
             "1" | "2" => {
-                // submodule state has len 4
-                if parts[1].len() == 2 {
-                    if !parts[1].starts_with(".") {
-                        result.staged += 1;
-                    }
-                    if !parts[1].ends_with(".") {
-                        result.changed += 1;
-                    }
+                // We can ignore the submodule state as it is also indicated
+                // by ".M", so we already track it as a change.
+                if !parts[1].starts_with(".") {
+                    result.staged += 1;
+                }
+                if !parts[1].ends_with(".") {
+                    result.changed += 1;
                 }
             },
             "u" => result.conflicts += 1,
@@ -67,4 +66,64 @@ fn parse_status(status: &str) -> Status {
     }
 
     result
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_status_full() {
+        let output = "
+# branch.oid dc716b061d9a0bc6a59f4e02d72b9952cce28927
+# branch.head master
+# branch.upstream origin/master
+# branch.ab +1 -2
+1 .M <sub> <mH> <mI> <mW> <hH> <hI> modified.txt
+1 .D <sub> <mH> <mI> <mW> <hH> <hI> deleted.txt
+1 M. <sub> <mH> <mI> <mW> <hH> <hI> staged.txt
+1 MM <sub> <mH> <mI> <mW> <hH> <hI> staged_modified.txt
+1 MD <sub> <mH> <mI> <mW> <hH> <hI> staged_deleted.txt
+1 A. <sub> <mH> <mI> <mW> <hH> <hI> added.txt
+1 AM <sub> <mH> <mI> <mW> <hH> <hI> added_modified.txt
+1 AD <sub> <mH> <mI> <mW> <hH> <hI> added_deleted.txt
+1 D. <sub> <mH> <mI> <mW> <hH> <hI> deleted.txt
+1 DM <sub> <mH> <mI> <mW> <hH> <hI> deleted_modified.txt
+2 R. <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+2 RM <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+2 RD <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+2 C. <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+2 CM <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+2 CD <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
+u UU <sub> <m1> <m2> <m3> <mW> <h1> <h2> <h3> <path>
+? untracked.txt
+! ignored.txt
+";
+        let mut expected = Status::new();
+        expected.branch = "master".to_string();
+        expected.ahead = 1;
+        expected.behind = 2;
+        expected.staged = 14;
+        expected.changed = 11;
+        expected.untracked = 1;
+        expected.conflicts = 1;
+        assert_eq!(parse_status(output), expected);
+    }
+
+    #[test]
+    fn parse_status_clean() {
+        let output = "
+# branch.oid dc716b061d9a0bc6a59f4e02d72b9952cce28927
+# branch.head master
+";
+        let mut expected = Status::new();
+        expected.branch = "master".to_string();
+        assert_eq!(parse_status(output), expected);
+    }
+
+    #[test]
+    fn parse_status_emty() {
+        assert_eq!(parse_status(""), Status::new());
+    }
 }

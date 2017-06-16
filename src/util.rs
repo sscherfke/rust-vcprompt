@@ -1,6 +1,7 @@
 //! Commonly used utilities
 
 /// The current VC status
+#[derive(PartialEq, Debug)]
 pub struct Status {
     /// The branch name
     pub branch: String,
