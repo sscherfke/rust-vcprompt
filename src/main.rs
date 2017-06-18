@@ -1,14 +1,9 @@
 mod git;
 mod util;
 
-extern crate clap;
-
 use std::collections::HashMap;
 use std::env;
 use std::path::PathBuf;
-
-
-use clap::{Arg, App};
 
 use util::Status;
 
@@ -22,9 +17,9 @@ enum VCS {
 }
 
 impl VCS {
-    fn get_status(self, cwd: &str) -> Option<Status> {
+    fn get_status(self) -> Option<Status> {
         match self {
-            VCS::Git => git::git(cwd),
+            VCS::Git => git::git(),
             VCS::Hg => None,
             VCS::None => None,
         }
@@ -139,16 +134,5 @@ fn print_result(status: &Status) {
 
 
 fn main() {
-    let matches = App::new("vcprompt")
-        .version("0.1")
-        .about("Version control information in your prompt")
-        .arg(Arg::with_name("cwd")
-             .short("c")
-             .long("cwd")
-             .help("Use this directory as CWD")
-             .takes_value(true))
-        .get_matches();
-    let cwd = matches.value_of("cwd").unwrap_or(".");
-
-    get_vcs().get_status(cwd).map(|r| print_result(&r));
+    get_vcs().get_status().map(|r| print_result(&r));
 }

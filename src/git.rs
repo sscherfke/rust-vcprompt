@@ -4,9 +4,9 @@ use std::process::Command;
 use util::Status;
 
 
-/// Get the status for `cwd`
-pub fn git(cwd: &str) -> Option<Status> {
-    let status = get_status(cwd);
+/// Get the status for the cwd
+pub fn git() -> Option<Status> {
+    let status = get_status();
     match status {
         Some(s) => Some(parse_status(&s)),
         None => None,
@@ -14,14 +14,12 @@ pub fn git(cwd: &str) -> Option<Status> {
 }
 
 /// Run `git status` and return its output if we are in a Git repo.
-fn get_status(cwd: &str) -> Option<String> {
+fn get_status() -> Option<String> {
     let result = Command::new("git")
                 .arg("status")
                 .arg("--porcelain=2")
                 .arg("--branch")
                 .arg("--untracked-files")
-                // .arg("--ignored")
-                .current_dir(cwd)
                 .output()
                 .expect("failed to execute process");
 
