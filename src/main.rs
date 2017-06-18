@@ -68,11 +68,11 @@ fn print_result(status: &Status) {
     ].iter().cloned().collect();
 
     let mut variables: HashMap<&str, String> = [
-        ("VCP_PREFIX", "("),
-        ("VCP_SUFFIX", "{reset})"),
-        ("VCP_SEPARATOR", "|"),
-        ("VCP_NAME", "{green}{bold}{symbol}{reset}"),  // value|symbol
-        ("VCP_BRANCH", "{value}"),
+        ("VCP_PREFIX", " "),
+        ("VCP_SUFFIX", "{reset}"),
+        ("VCP_SEPARATOR", ""),
+        ("VCP_NAME", "{symbol}"),  // value|symbol
+        ("VCP_BRANCH", "{blue}{value}{reset}"),
         ("VCP_BEHIND", "↓{value}"),
         ("VCP_AHEAD", "↑{value}"),
         ("VCP_STAGED", "{red}●{value}"),
