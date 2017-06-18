@@ -3,6 +3,10 @@
 /// The current VC status
 #[derive(PartialEq, Debug)]
 pub struct Status {
+    /// VCS name
+    pub name: String,
+    /// VCS symbol
+    pub symbol: String,
     /// The branch name
     pub branch: String,
     /// Number of revisions we are ahead of upstream
@@ -21,8 +25,10 @@ pub struct Status {
 
 impl Status {
     /// Create a new instance with all values set to `<unknown>` branch and `0`.
-    pub fn new() -> Status {
+    pub fn new<S>(name: S, symbol: S) -> Status where S: Into<String> {
         Status {
+            name: name.into(),
+            symbol: symbol.into(),
             branch: "<unknown>".to_string(),
             ahead: 0,
             behind: 0,

@@ -34,7 +34,7 @@ fn get_status(cwd: &str) -> Option<String> {
 
 /// Parse the output string `get_status()`.
 fn parse_status(status: &str) -> Status {
-    let mut result = Status::new();
+    let mut result = Status::new("git", "±");
 
     for line in status.lines() {
         let parts: Vec<&str> = line.split(" ").collect();
@@ -100,7 +100,7 @@ u UU <sub> <m1> <m2> <m3> <mW> <h1> <h2> <h3> <path>
 ? untracked.txt
 ! ignored.txt
 ";
-        let mut expected = Status::new();
+        let mut expected = Status::new("git", "±");
         expected.branch = "master".to_string();
         expected.ahead = 1;
         expected.behind = 2;
@@ -117,13 +117,13 @@ u UU <sub> <m1> <m2> <m3> <mW> <h1> <h2> <h3> <path>
 # branch.oid dc716b061d9a0bc6a59f4e02d72b9952cce28927
 # branch.head master
 ";
-        let mut expected = Status::new();
+        let mut expected = Status::new("git", "±");
         expected.branch = "master".to_string();
         assert_eq!(parse_status(output), expected);
     }
 
     #[test]
     fn parse_status_emty() {
-        assert_eq!(parse_status(""), Status::new());
+        assert_eq!(parse_status(""), Status::new("git", "±"));
     }
 }

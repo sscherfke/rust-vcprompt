@@ -5,18 +5,60 @@ extern crate clap;
 
 use std::collections::HashMap;
 use std::env;
+use std::path::PathBuf;
+
 
 use clap::{Arg, App};
 
 use util::Status;
 
 
-/// Format and print the current VC status
-fn print_result(vcs: &str, status: &Status) {
-    let symbols: HashMap<&str, &str> = [
-        ("git", "±"),
-    ].iter().cloned().collect();
+/// Supported version control systems
+#[derive(Clone)]
+enum VCS {
+    Git,
+    Hg,
+    None,
+}
 
+impl VCS {
+    fn get_status(self, cwd: &str) -> Option<Status> {
+        match self {
+            VCS::Git => git::git(cwd),
+            VCS::Hg => None,
+            VCS::None => None,
+        }
+    }
+}
+
+
+/// Determine the inner most VCS.
+///
+/// This functions works for nest (sub) repos and always returns
+/// the most inner repository type.
+fn get_vcs() -> VCS {
+    let vcs_files = [
+        (VCS::Git, ".git/HEAD"),
+        (VCS::Hg, ".hg/00changelog.i"),
+    ];
+
+    let mut cwd = Some(env::current_dir().unwrap());
+    while let Some(path) = cwd {
+        for &(ref vcs, vcs_file) in vcs_files.iter() {
+            let mut fname = path.clone();
+            fname.push(vcs_file);
+            if fname.exists() {
+                return (*vcs).clone();
+            }
+        }
+        cwd = path.parent().map(|p| PathBuf::from(p));
+    }
+    VCS::None
+}
+
+
+/// Format and print the current VC status
+fn print_result(status: &Status) {
     let colors: HashMap<&str, &str> = [
         ("{reset}", "\x1B[00m"),
         ("{bold}", "\x1B[01m"),
@@ -55,8 +97,8 @@ fn print_result(vcs: &str, status: &Status) {
     let mut output = String::with_capacity(100);
     output.push_str(&variables.get("VCP_PREFIX").unwrap());
     output.push_str(&variables.get("VCP_NAME").unwrap()
-                    .replace("{value}", vcs)
-                    .replace("{symbol}", symbols.get(vcs).unwrap()));
+                    .replace("{value}", &status.name)
+                    .replace("{symbol}", &status.symbol));
     output.push_str(&variables.get("VCP_BRANCH").unwrap()
                     .replace("{value}", &status.branch));
     if status.behind > 0 {
@@ -107,10 +149,6 @@ fn main() {
              .takes_value(true))
         .get_matches();
     let cwd = matches.value_of("cwd").unwrap_or(".");
-    println!("Cwd: {}", cwd);
-    let status = git::git(&cwd);
-    match status {
-        Some(r) =>  print_result("git", &r),
-        None => (),
-    }
+
+    get_vcs().get_status(cwd).map(|r| print_result(&r));
 }
