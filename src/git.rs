@@ -5,32 +5,31 @@ use util::Status;
 
 
 /// Get the status for the cwd
-pub fn git() -> Option<Status> {
+pub fn status() -> Status {
     let status = get_status();
-    match status {
-        Some(s) => Some(parse_status(&s)),
-        None => None,
-    }
+    parse_status(&status)
 }
 
-/// Run `git status` and return its output if we are in a Git repo.
-fn get_status() -> Option<String> {
+/// Run `git status` and return its output.
+fn get_status() -> String {
     let result = Command::new("git")
                 .arg("status")
                 .arg("--porcelain=2")
                 .arg("--branch")
                 .arg("--untracked-files")
                 .output()
-                .expect("failed to execute process");
+                .expect("Failed to execute \"git\"");
+
+    let output = String::from_utf8_lossy(&result.stdout).into_owned();
 
     if !result.status.success() {
-        return None;
+        panic!("git status failed: {}", &output);
     }
 
-    Some(String::from_utf8_lossy(&result.stdout).into_owned())
+    output
 }
 
-/// Parse the output string `get_status()`.
+/// Parse the output string of `get_status()`.
 fn parse_status(status: &str) -> Status {
     let mut result = Status::new("git", "±");
 
@@ -60,12 +59,10 @@ fn parse_status(status: &str) -> Status {
             "?" => result.untracked += 1,
             _ => (),
         }
-
     }
 
     result
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,5 @@
 mod git;
+mod hg;
 mod util;
 
 use std::collections::HashMap;
@@ -17,10 +18,10 @@ enum VCS {
 }
 
 impl VCS {
-    fn get_status(self) -> Option<Status> {
+    fn get_status(self, rootdir: Option<PathBuf>) -> Option<Status> {
         match self {
-            VCS::Git => git::git(),
-            VCS::Hg => None,
+            VCS::Git => Some(git::status()),
+            VCS::Hg => Some(hg::status(rootdir.unwrap())),
             VCS::None => None,
         }
     }
@@ -31,7 +32,7 @@ impl VCS {
 ///
 /// This functions works for nest (sub) repos and always returns
 /// the most inner repository type.
-fn get_vcs() -> VCS {
+fn get_vcs() -> (VCS, Option<PathBuf>) {
     let vcs_files = [
         (VCS::Git, ".git/HEAD"),
         (VCS::Hg, ".hg/00changelog.i"),
@@ -43,12 +44,12 @@ fn get_vcs() -> VCS {
             let mut fname = path.clone();
             fname.push(vcs_file);
             if fname.exists() {
-                return (*vcs).clone();
+                return ((*vcs).clone(), Some(path));
             }
         }
         cwd = path.parent().map(|p| PathBuf::from(p));
     }
-    VCS::None
+    (VCS::None, None)
 }
 
 
@@ -134,5 +135,6 @@ fn print_result(status: &Status) {
 
 
 fn main() {
-    get_vcs().get_status().map(|r| print_result(&r));
+    let (vcs, rootdir) = get_vcs();
+    vcs.get_status(rootdir).map(|r| print_result(&r));
 }
