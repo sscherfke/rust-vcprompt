@@ -2,3 +2,9 @@
 name = "vcprompt"
 version = "0.1.0"
 authors = ["Stefan Scherfke <stefan@sofa-rockers.org>"]
+keywords = ["prompt", "bash", "zsh", "git", "hg"]
+categories = ["command-line-utilities"]
+description = "Version control information in your shell prompt"
+readme = "README.md"
+license = "BSD-3-Clause"
+repository = "https://gitlab.com/sscherfke/rust-vcprompt"
