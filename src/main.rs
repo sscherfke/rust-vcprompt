@@ -9,6 +9,12 @@ use std::path::PathBuf;
 use util::Status;
 
 
+/// Available formatting styles
+enum OutputStyle {
+    Detailed,
+    Minimal,
+}
+
 /// Supported version control systems
 #[derive(Clone)]
 enum VCS {
@@ -54,7 +60,7 @@ fn get_vcs() -> (VCS, Option<PathBuf>) {
 
 
 /// Format and print the current VC status
-fn print_result(status: &Status) {
+fn print_result(status: &Status, style: OutputStyle) {
     let colors: HashMap<&str, &str> = [
         ("{reset}", "\x1B[00m"),
         ("{bold}", "\x1B[01m"),
@@ -71,7 +77,7 @@ fn print_result(status: &Status) {
     let mut variables: HashMap<&str, String> = [
         ("VCP_PREFIX", " "),
         ("VCP_SUFFIX", "{reset}"),
-        ("VCP_SEPARATOR", ""),
+        ("VCP_SEPARATOR", "|"),
         ("VCP_NAME", "{symbol}"),  // value|symbol
         ("VCP_BRANCH", "{blue}{value}{reset}"),
         ("VCP_BEHIND", "↓{value}"),
@@ -90,6 +96,20 @@ fn print_result(status: &Status) {
         };
     }
 
+    let mut output = match style {
+        OutputStyle::Detailed => format_full(&status, &variables),
+        OutputStyle::Minimal => format_minimal(&status, &variables),
+    };
+
+    for (k, v) in colors.iter() {
+        output = output.replace(k, v);
+    }
+    println!("{}", output);
+}
+
+/// Format *status* in detailed style
+/// (`{name}{branch}{branch tracking}|{local status}`).
+fn format_full(status: &Status, variables: &HashMap<&str, String>) -> String {
     let mut output = String::with_capacity(100);
     output.push_str(&variables.get("VCP_PREFIX").unwrap());
     output.push_str(&variables.get("VCP_NAME").unwrap()
@@ -122,19 +142,64 @@ fn print_result(status: &Status) {
         output.push_str(&variables.get("VCP_UNTRACKED").unwrap()
                         .replace("{value}", &status.untracked.to_string()));
     }
-    if status.staged == 0 && status.conflicts == 0 && status.changed == 0 && status.untracked == 0 {
+    if status.is_clean() {
         output.push_str(&variables.get("VCP_CLEAN").unwrap());
     }
     output.push_str(&variables.get("VCP_SUFFIX").unwrap());
 
-    for (k, v) in colors.iter() {
-        output = output.replace(k, v);
+    output
+}
+
+/// Format *status* in minimal style
+/// (`{branch}{colored_symbol}`).
+fn format_minimal(status: &Status, variables: &HashMap<&str, String>) -> String {
+    let mut output = String::with_capacity(100);
+    output.push_str(&variables.get("VCP_PREFIX").unwrap());
+    output.push_str(&variables.get("VCP_BRANCH").unwrap()
+                    .replace("{value}", &status.branch));
+    if status.is_clean() {
+        output.push_str("{bold}{green}");
+    } else if status.staged > 0 {
+        output.push_str("{bold}{red}");
+    } else {
+        output.push_str("{bold}{yellow}");
     }
-    println!("{}", output);
+    output.push_str(&status.symbol);
+    output.push_str("{reset}");
+    output.push_str(&variables.get("VCP_SUFFIX").unwrap());
+
+    output
+}
+
+/// Print vcprompt's help message.
+///
+/// *name* is the name with which the program has been invoked.
+fn print_help(name: &str) {
+    println!("Usage: {} [OPTIONS]
+
+    Print version control information for use in your shell prompt.
+
+Options:
+  -h, --help        Show this message and exit.
+  -m, --minimal     Use minimal format instead of full format.",
+  name);
 }
 
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.len() > 1 && ["-h", "--help"].contains(&args[1].as_str()) {
+        print_help(&args[0]);
+        return
+    }
+
+    let style = if args.len() > 1 && args[1] == "--minimal" {
+        OutputStyle::Minimal
+    } else {
+        OutputStyle::Detailed
+    };
+
     let (vcs, rootdir) = get_vcs();
-    vcs.get_status(rootdir).map(|r| print_result(&r));
+    vcs.get_status(rootdir).map(|r| print_result(&r, style));
 }
