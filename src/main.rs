@@ -157,6 +157,14 @@ fn format_minimal(status: &Status, variables: &HashMap<&str, String>) -> String 
     output.push_str(&variables.get("VCP_PREFIX").unwrap());
     output.push_str(&variables.get("VCP_BRANCH").unwrap()
                     .replace("{value}", &status.branch));
+    if status.behind > 0 {
+        output.push_str(&variables.get("VCP_BEHIND").unwrap()
+                        .replace("{value}", &status.behind.to_string()));
+    }
+    if status.ahead > 0 {
+        output.push_str(&variables.get("VCP_AHEAD").unwrap()
+                        .replace("{value}", &status.ahead.to_string()));
+    }
     if status.is_clean() {
         output.push_str("{bold}{green}");
     } else if status.staged > 0 {
