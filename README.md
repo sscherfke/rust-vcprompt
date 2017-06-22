@@ -1,7 +1,7 @@
 Informative version control prompt for your shell
 =================================================
 
-[![build status](https://gitlab.com/sscherfke/rust-vcprompt/badges/master/build.svg)](https://gitlab.com/sscherfke/rust-vcprompt/commits/master)
+[![Build Status](https://travis-ci.org/sscherfke/rust-vcprompt.svg?branch=master)](https://travis-ci.org/sscherfke/rust-vcprompt)
 
 A small program that prints a summary of the current git/hg repository for use
 in a shell prompt (like Bash or ZSH).
