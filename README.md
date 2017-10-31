@@ -18,6 +18,8 @@ of staged files, changed files, untracked files and conflicts.
 
 <img src="vcprompt-detailed.png" width="602" height="226" alt="vcprompt’s detailed style">
 
+[See it in action!](https://asciinema.org/a/126175)
+
 
 ## Minimal Style
 
@@ -26,6 +28,8 @@ status in the color of the VCS symbol: *green* means clean, *yellow* indicates
 untracked files or unstaged changes and *red* means there are staged files.
 
 <img src="vcprompt-minimal.png" width="602" height="328" alt="vcprompt’s minimal style">
+
+[See it in action!](https://asciinema.org/a/126176)
 
 
 ## Prompt Structure
