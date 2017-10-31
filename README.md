@@ -74,7 +74,28 @@ be shown as *staged*.
 
 ## Installation
 
-There are no binary releases yet, so you have to compile vcprompt on your own:
+You can download a [binary
+release](https://github.com/sscherfke/rust-vcprompt/releases) or use one of the
+following methods to install rust-vcprompt.
+
+### homebrew
+
+On MacOS, you can use [Homebrew](https://brew.sh):
+
+```bash
+$ brew tap sscherfke/rust-vcprompt
+$ brew install rust-vcprompt
+```
+
+### Cargo
+
+You can use Cargo to install directly from [crates.io](https://crates.io)
+
+```bash
+$ cargo install --root=$HOME/.local vcprompt
+```
+
+### Build from source
 
 - Install Rust and Cargo.
 - Clone this repo and `cd` into it.
