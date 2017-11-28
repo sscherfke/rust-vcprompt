@@ -26,7 +26,7 @@ enum VCS {
 impl VCS {
     fn get_status(self, rootdir: Option<PathBuf>) -> Option<Status> {
         match self {
-            VCS::Git => Some(git::status()),
+            VCS::Git => Some(git::status(rootdir.unwrap())),
             VCS::Hg => Some(hg::status(rootdir.unwrap())),
             VCS::None => None,
         }
@@ -80,6 +80,7 @@ fn print_result(status: &Status, style: OutputStyle) {
         ("VCP_SEPARATOR", "|"),
         ("VCP_NAME", "{symbol}"),  // value|symbol
         ("VCP_BRANCH", "{blue}{value}{reset}"),
+        ("VCP_OPERATION", "{red}{value}{reset}"),
         ("VCP_BEHIND", "↓{value}"),
         ("VCP_AHEAD", "↑{value}"),
         ("VCP_STAGED", "{red}●{value}"),
@@ -124,6 +125,11 @@ fn format_full(status: &Status, variables: &HashMap<&str, String>) -> String {
     if status.ahead > 0 {
         output.push_str(&variables.get("VCP_AHEAD").unwrap()
                         .replace("{value}", &status.ahead.to_string()));
+    }
+    for op in status.operations.iter() {
+        output.push_str(&variables.get("VCP_SEPARATOR").unwrap());
+        output.push_str(&variables.get("VCP_OPERATION").unwrap()
+                        .replace("{value}", op));
     }
     output.push_str(&variables.get("VCP_SEPARATOR").unwrap());
     if status.staged > 0 {

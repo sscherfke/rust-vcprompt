@@ -1,13 +1,26 @@
 //! Get Git status
+use std::path::PathBuf;
 use std::process::Command;
 
 use util::Status;
 
 
+static OPERATIONS: [(&str, &str); 6] = [
+    ("rebase-merge", "REBASE"),
+    ("rebase-apply", "AM/REBASE"),
+    ("MERGE_HEAD", "MERGING"),
+    ("CHERRY_PICK_HEAD", "CHERRY-PICKING"),
+    ("REVERT_HEAD", "REVERTING"),
+    ("BISECT_LOG", "BISECTING"),
+];
+
+
 /// Get the status for the cwd
-pub fn status() -> Status {
+pub fn status(rootdir: PathBuf) -> Status {
     let status = get_status();
-    parse_status(&status)
+    let mut result = parse_status(&status);
+    get_operations(&mut result.operations, &rootdir);
+    result
 }
 
 /// Run `git status` and return its output.
@@ -64,8 +77,26 @@ fn parse_status(status: &str) -> Status {
     result
 }
 
+
+/// Look for files that indicate an ongoing operation (e.g., a merge)
+/// and update *list* accordingly
+fn get_operations(list: &mut Vec<&str>, rootdir: &PathBuf) {
+    let mut gitdir = rootdir.clone();
+    gitdir.push(".git");
+    for &(fname, op) in OPERATIONS.iter() {
+        let mut file = gitdir.clone();
+        file.push(fname);
+        if file.exists() {
+            list.push(op);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use std::env::temp_dir;
+    use std::fs::{DirBuilder,File};
+
     use super::*;
 
     #[test]
@@ -120,5 +151,22 @@ u UU <sub> <m1> <m2> <m3> <mW> <h1> <h2> <h3> <path>
     #[test]
     fn parse_status_emty() {
         assert_eq!(parse_status(""), Status::new("git", "±"));
+    }
+
+    #[test]
+    fn detect_merge() {
+        let mut result = Vec::<&str>::new();
+        let mut rootdir = temp_dir();
+        rootdir.push("test-vcprompt");
+
+        let mut path = rootdir.clone();
+        path.push(".git");
+        DirBuilder::new().recursive(true).create(path.clone()).unwrap();
+        path.push("MERGE_HEAD");
+        File::create(path).unwrap();
+
+        get_operations(&mut result, &rootdir);
+
+        assert_eq!(result, vec!["MERGING"]);
     }
 }

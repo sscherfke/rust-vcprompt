@@ -36,7 +36,7 @@ untracked files or unstaged changes and *red* means there are staged files.
 
 The general structure of the detailed format is:
 ```
-{vcs name/symbol}{branch}{branch tracking}|{local status}
+{vcs name/symbol}{branch}{branch tracking}{operations}|{local status}
 ```
 The structure of the minimal format is:
 ```
@@ -63,6 +63,11 @@ current bookmark is also shown there (e.g., `default*mybookmark`).
 
 Branch tracking symbols are only shown for Git repos:
 
+### `{operations}`
+
+This is a list of ongoing operations, e.g., a merge (`|MERGING`) or bisect
+(`|BISECTING`).
+
 ### `{local status}`
 
 ```
@@ -82,7 +87,7 @@ You can download a [binary
 release](https://github.com/sscherfke/rust-vcprompt/releases) or use one of the
 following methods to install rust-vcprompt.
 
-### homebrew
+### Homebrew
 
 On MacOS, you can use [Homebrew](https://brew.sh):
 
@@ -120,6 +125,7 @@ following environment variables in your shell’s config file:
 export VCP_PREFIX=" "
 export VCP_NAME="{symbol}"  # You can use "value" or "symbol" here
 export VCP_BRANCH="{blue}{value}{reset}"
+export VCP_OPERATION="{red}{value}{reset}"
 export VCP_BEHIND="↓{value}"
 export VCP_AHEAD="↑{value}"
 export VCP_SEPARATOR="|"

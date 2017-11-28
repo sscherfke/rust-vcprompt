@@ -21,6 +21,8 @@ pub struct Status {
     pub untracked: u32,
     /// Number of conflicts
     pub conflicts: u32,
+    /// Ongoing operations (e.g., merging)
+    pub operations: Vec<&'static str>,
 }
 
 impl Status {
@@ -36,6 +38,7 @@ impl Status {
             changed: 0,
             untracked: 0,
             conflicts: 0,
+            operations: vec![],
         }
     }
 
