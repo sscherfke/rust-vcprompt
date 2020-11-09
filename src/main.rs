@@ -83,11 +83,11 @@ fn print_result(status: &Status, style: OutputStyle) {
         ("VCP_OPERATION", "{red}{value}{reset}"),
         ("VCP_BEHIND", "↓{value}"),
         ("VCP_AHEAD", "↑{value}"),
-        ("VCP_STAGED", "{red}●{value}"),
-        ("VCP_CONFLICTS", "{red}✖{value}"),
-        ("VCP_CHANGED", "{blue}✚{value}"),
-        ("VCP_UNTRACKED", "{reset}…{value}"),
-        ("VCP_CLEAN", "{green}{bold}✔"),
+        ("VCP_STAGED", "{blue}✚{value}"),  // Alternative:  +
+        ("VCP_CONFLICTS", "{red}✖︎{value}"),  // Alternative: ×
+        ("VCP_CHANGED", "{yellow}↻{value}"),
+        ("VCP_UNTRACKED", "{magenta}…{value}"),
+        ("VCP_CLEAN", "{green}✔︎"),  // Alternative: ✓
     ].iter().map(|&(k, v)| (k, v.to_string())).collect();
 
     for (k, v) in variables.iter_mut() {

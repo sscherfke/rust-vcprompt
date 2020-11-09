@@ -3,8 +3,7 @@ Informative version control prompt for your shell
 
 [![Build Status](https://travis-ci.org/sscherfke/rust-vcprompt.svg?branch=master)](https://travis-ci.org/sscherfke/rust-vcprompt)
 
-A small program that prints a summary of the current git/hg repository for use
-in a shell prompt (like Bash or ZSH).
+A small program that prints a summary of the current git/hg repository for use in a shell prompt (like Bash or ZSH).
 
 You can choose between two styles – one with full details and a minimal one.
 Both styles can be configured as you like.
@@ -12,9 +11,7 @@ Both styles can be configured as you like.
 
 ## Detailed Style
 
-The detailed style shows the VCS name or symbol, your current branch, the
-number of commits you are ahead/behind a tracking branch as well as the number
-of staged files, changed files, untracked files and conflicts.
+The detailed style shows the VCS name or symbol, your current branch, the number of commits you are ahead/behind a tracking branch as well as the number of staged files, changed files, untracked files and conflicts.
 
 <img src="vcprompt-detailed.png" width="602" height="226" alt="vcprompt’s detailed style">
 
@@ -23,9 +20,8 @@ of staged files, changed files, untracked files and conflicts.
 
 ## Minimal Style
 
-The minimal style only shows the current branch and encodes the repository
-status in the color of the VCS symbol: *green* means clean, *yellow* indicates
-untracked files or unstaged changes and *red* means there are staged files.
+The minimal style only shows the current branch and encodes the repository status in the color of the VCS symbol:
+*green* means clean, *yellow* indicates untracked files or unstaged changes and *red* means there are staged files.
 
 <img src="vcprompt-minimal.png" width="602" height="328" alt="vcprompt’s minimal style">
 
@@ -45,13 +41,12 @@ The structure of the minimal format is:
 
 ### `{vcs name/symbol}`
 
-You can show either the VCS name (*git* or *hg*) or just a symbol (*±* or
-*☿*).
+You can show either the VCS name (*git* or *hg*) or just a symbol (*±* or *☿*).
 
 ### `{branch}`
 
-This is just the current branch’s name.  In Mercurial repos, the name of the
-current bookmark is also shown there (e.g., `default*mybookmark`).
+This is just the current branch’s name.
+In Mercurial repos, the name of the current bookmark is also shown there (e.g., `default*mybookmark`).
 
 ### `{branch tracking}`
 
@@ -65,27 +60,23 @@ Branch tracking symbols are only shown for Git repos:
 
 ### `{operations}`
 
-This is a list of ongoing operations, e.g., a merge (`|MERGING`) or bisect
-(`|BISECTING`).
+This is a list of ongoing operations, e.g., a merge (`|MERGING`) or bisect (`|BISECTING`).
 
 ### `{local status}`
 
 ```
-✔     repository clean
-●n    there are n staged files
-✖n    there are n unmerged files
-✚n    there are n modified (but unstaged) files
+✔︎     repository clean
+✚n    there are n staged files
+✖︎n    there are n unmerged files
+↻n    there are n modified (but unstaged) files
 …n    there are n untracked files
 ```
 
-Mercurial automatically stages changed files, so *modified* files will always
-be shown as *staged*.
+Mercurial automatically stages changed files, so *modified* files will always be shown as *staged*.
 
 ## Installation
 
-You can download a [binary
-release](https://github.com/sscherfke/rust-vcprompt/releases) or use one of the
-following methods to install rust-vcprompt.
+You can download a [binary release](https://github.com/sscherfke/rust-vcprompt/releases) or use one of the following methods to install rust-vcprompt.
 
 ### Homebrew
 
@@ -114,12 +105,9 @@ $ cargo install --root=$HOME/.local vcprompt
 
 ## Usage and Customisation
 
-Insert `$(vcprompt)` (or `$(vcprompt --minimal)` for the minimal style) into
-the prompt variable of your shell (e.g., `PS1` in `.bashrc` or `PROMPT` in
-`.zshrc`.
+Insert `$(vcprompt)` (or `$(vcprompt --minimal)` for the minimal style) into the prompt variable of your shell (e.g., `PS1` in `.bashrc` or `PROMPT` in `.zshrc`.
 
-You can configure the appearance of the output by exporting one of the
-following environment variables in your shell’s config file:
+You can configure the appearance of the output by exporting one of the following environment variables in your shell’s config file:
 
 ```bash
 export VCP_PREFIX=" "
@@ -129,40 +117,29 @@ export VCP_OPERATION="{red}{value}{reset}"
 export VCP_BEHIND="↓{value}"
 export VCP_AHEAD="↑{value}"
 export VCP_SEPARATOR="|"
-export VCP_STAGED="{red}●{value}"
-export VCP_CONFLICTS="{red}✖{value}"
-export VCP_CHANGED="{blue}✚{value}"
-export VCP_UNTRACKED="{reset}…{value}"
-export VCP_CLEAN="{green}{bold}✔"
+export VCP_STAGED="{blue}✚{value}"  # +
+export VCP_CONFLICT="{red}✖︎{value}"  # ×
+export VCP_CHANGED="{yellow}↻{value}"  #
+export VCP_UNTRACKED="{magenta}…{value}"
+export VCP_CLEAN="{green}✔︎"  # ✓
 export VCP_SUFFIX="{reset}"
 ```
 
-The values above are the default values and are ordered in the same
-way as they appear in the output.
+The values above are the default values and are ordered in the same way as they appear in the output.
 
-The placeholders `{value}`/`{symbol}` are replaced by the corresponding values,
-the placeholders `{reset}`, `{bold}`, `{black}`, `{red}`, `{green}`,
-`{yellow}`, `{blue}`, `{magenta}`, `{cyan}`, and `{white}` are replaced by the
-corresponding ANSI color codes.
+The placeholders `{value}`/`{symbol}` are replaced by the corresponding values.
+The placeholders `{reset}`, `{bold}`, `{black}`, `{red}`, `{green}`, `{yellow}`, `{blue}`, `{magenta}`, `{cyan}`, and `{white}` are replaced by the corresponding ANSI color codes.
 
-The minimal style only uses the variables `VCP_PREFIX`, `VCP_BRANCH`,
-`VCP_BEHIND`, `VCP_AHEAD` and `VCP_SUFFIX`.
+The minimal style only uses the variables `VCP_PREFIX`, `VCP_BRANCH`, `VCP_BEHIND`, `VCP_AHEAD` and `VCP_SUFFIX`.
 
 
 ## Why?
 
-This program is inspired by (and can be configured to be compatible with) the
-[oh-my-zsh
-git-prompt](https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git-prompt)
-and the original [vcprompt
-C implementation](https://bitbucket.org/gward/vcprompt).
+This program is inspired by (and can be configured to be compatible with) the [oh-my-zsh git-prompt](https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git-prompt) and the original [vcprompt C implementation](https://bitbucket.org/gward/vcprompt).
 
-Rust-vcprompt is way faster than the Python git-prompt (and similar Python
-scripts).  On my machine it takes ~12ms for smaller repos and ~24ms for repos
-with thousands of commits while the Python implementations need at least 50ms.
-This makes rust-vcprompt more suitable for synchronous prompts (which you
-usually use).
+Rust-vcprompt is way faster than the Python git-prompt (and similar Python scripts).
+On my machine it takes ~12ms for smaller repos and ~24ms for repos with thousands of commits while the Python implementations need at least 50ms.
+This makes rust-vcprompt more suitable for synchronous prompts (which you usually use).
 
-The C implementation has a comparable performance to rust-vcprompt and also
-supports more VCS.  However, rust-vcprompt gives you more flexibility with
-formatting your prompt.
+The C implementation has a comparable performance to rust-vcprompt and also supports more VCS.
+However, rust-vcprompt gives you more flexibility with formatting your prompt.
