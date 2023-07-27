@@ -61,18 +61,18 @@ fn get_vcs() -> (VCS, Option<PathBuf>) {
 
 /// Format and print the current VC status
 fn print_result(status: &Status, style: OutputStyle) {
-    let colors: HashMap<&str, &str> = [
-        ("{reset}", "\x1B[00m"),
-        ("{bold}", "\x1B[01m"),
-        ("{black}", "\x1B[30m"),
-        ("{red}", "\x1B[31m"),
-        ("{green}", "\x1B[32m"),
-        ("{yellow}", "\x1B[33m"),
-        ("{blue}", "\x1B[34m"),
-        ("{magenta}", "\x1B[35m"),
-        ("{cyan}", "\x1B[36m"),
-        ("{white}", "\x1B[37m"),
-    ].iter().cloned().collect();
+    let colors: HashMap<&str, String> = [
+        ("{reset}", "22;39"),
+        ("{bold}", "1"),
+        ("{black}", "30"),
+        ("{red}", "31"),
+        ("{green}", "32"),
+        ("{yellow}", "33"),
+        ("{blue}", "34"),
+        ("{magenta}", "35"),
+        ("{cyan}", "36"),
+        ("{white}", "37"),
+    ].iter().map(|&(k, v)| (k, format!("\x01\x1B[{}m", v))).collect();
 
     let mut variables: HashMap<&str, String> = [
         ("VCP_PREFIX", " "),
