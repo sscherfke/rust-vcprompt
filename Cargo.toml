@@ -1,6 +1,6 @@
 [package]
 name = "vcprompt"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Stefan Scherfke <stefan@sofa-rockers.org>"]
 description = "Version control information in your shell prompt"
 documentation = "https://github.com/sscherfke/rust-vcprompt/blob/master/README.md"
