@@ -1,8 +1,6 @@
 Informative version control prompt for your shell
 =================================================
 
-[![Build Status](https://travis-ci.org/sscherfke/rust-vcprompt.svg?branch=master)](https://travis-ci.org/sscherfke/rust-vcprompt)
-
 A small program that prints a summary of the current git/hg repository for use in a shell prompt (like Bash or ZSH).
 
 You can choose between two styles – one with full details and a minimal one.
